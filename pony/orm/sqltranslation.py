@@ -123,7 +123,10 @@ class SQLTranslator(ASTTranslator):
                     if isinstance(msg, basestring) and '{EXPR}' in msg:
                         msg = msg.replace('{EXPR}', ast2src(node))
                         exc.args = (msg,) + exc.args[1:]
-                raise exc_class, exc, tb
+                try:
+                    raise exc_class(exc).with_traceback(tb)
+                except (TypeError, AttributeError):
+                    raise (exc_class, exc, tb)
             finally: del tb
         else:
             if monad is None: return
