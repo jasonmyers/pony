@@ -2495,9 +2495,11 @@ class Multiset(object):
 class EntityIter(object):
     def __init__(self, entity):
         self.entity = entity
-    def next(self):
+    def __next__(self):
         throw(TypeError, 'Use select(...) function or %s.select(...) method for iteration'
                          % self.entity.__name__)
+    def next(self):
+        return self.__next__()
 
 entity_id_counter = _count(1)
 new_instance_id_counter = _count(1)
