@@ -557,17 +557,18 @@ class Database(object):
     def insert(database, table_name, returning=None, **kwargs):
         if database.provider is None: throw(MappingError, 'Database object is not bound with a provider yet')
         table_name = table_name[:]  # table_name = templating.plainstr(table_name)
-        query_key = (table_name,) + tuple(kwargs)  # keys are not sorted deliberately!!
+        ordered_keys, ordered_values = izip(*iteritems(kwargs))
+        query_key = (table_name,) + tuple(ordered_keys)  # keys are not sorted deliberately!!
         if returning is not None: query_key = query_key + (returning,)
         cached_sql = database._insert_cache.get(query_key)
         if cached_sql is None:
-            ast = [ 'INSERT', table_name, kwargs.keys(),
-                    [ [ 'PARAM', (i, None, None) ] for i in xrange(len(kwargs)) ], returning ]
+            ast = [ 'INSERT', table_name, ordered_keys,
+                    [ [ 'PARAM', (i, None, None) ] for i in xrange(len(ordered_keys)) ], returning ]
             sql, adapter = database._ast2sql(ast)
             cached_sql = sql, adapter
             database._insert_cache[query_key] = cached_sql
         else: sql, adapter = cached_sql
-        arguments = adapter(kwargs.values())  # order of values same as order of keys
+        arguments = adapter(ordered_values)  # order of values same as order of keys
         if returning is not None:
             return database._exec_sql(sql, arguments, returning_id=True)
         cursor = database._exec_sql(sql, arguments)
