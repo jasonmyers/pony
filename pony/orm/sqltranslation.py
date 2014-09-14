@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, xrange, memoryview, pickle
+from pony.py23compat import izip, xrange, memoryview, pickle, with_metaclass
 
 import types, sys, re
 from itertools import count
@@ -892,11 +892,10 @@ class MonadMeta(type):
             cls_dict[name] = wrap_monad_method(cls_name, func)
         return super(MonadMeta, meta).__new__(meta, cls_name, bases, cls_dict)
 
-class MonadMixin(object):
-    __metaclass__ = MonadMeta
+class MonadMixin(with_metaclass(MonadMeta, object)):
+    pass
 
-class Monad(object):
-    __metaclass__ = MonadMeta
+class Monad(with_metaclass(MonadMeta, object)):
     def __init__(monad, translator, type):
         monad.translator = translator
         monad.type = type
@@ -1622,8 +1621,7 @@ class FuncMonadMeta(MonadMeta):
             for func in functions: special_functions[func] = monad_cls
         return monad_cls
 
-class FuncMonad(Monad):
-    __metaclass__ = FuncMonadMeta
+class FuncMonad(with_metaclass(FuncMonadMeta, Monad)):
     type = 'function'
     def __init__(monad, translator):
         monad.translator = translator

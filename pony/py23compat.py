@@ -54,3 +54,9 @@ try:
     import builtins
 except ImportError:
     import __builtin__ as builtins
+
+def with_metaclass(metaclass, *bases):
+    class Metaclass(metaclass):
+        def __new__(cls, name, this_bases, d):
+            return metaclass(name, bases, d)
+    return type.__new__(Metaclass, 'temporary_class', (), {})
