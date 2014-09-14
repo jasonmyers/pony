@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from pony.py23compat import iteritems
+from pony.py23compat import iteritems, memoryview
 
 import os
 os.environ["NLS_LANG"] = "AMERICAN_AMERICA.UTF8"
@@ -259,7 +259,7 @@ class OraDecimalConverter(dbapiprovider.DecimalConverter):
 
 class OraBlobConverter(dbapiprovider.BlobConverter):
     def sql2py(converter, val):
-        return buffer(val.read())
+        return memoryview(val.read())
 
 class OraDateConverter(dbapiprovider.DateConverter):
     def sql2py(converter, val):
@@ -297,7 +297,7 @@ class OraProvider(DBAPIProvider):
         ((int, long), OraIntConverter),
         (float, OraRealConverter),
         (Decimal, OraDecimalConverter),
-        (buffer, OraBlobConverter),
+        (memoryview, OraBlobConverter),
         (datetime, OraDatetimeConverter),
         (date, OraDateConverter),
         (UUID, OraUuidConverter),

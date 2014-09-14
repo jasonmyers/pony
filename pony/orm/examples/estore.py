@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function
+from pony.py23compat import memoryview
 
 from decimal import Decimal
 from datetime import datetime
@@ -22,7 +23,7 @@ class Product(db.Entity):
     name = Required(unicode)
     categories = Set("Category")
     description = Optional(unicode)
-    picture = Optional(buffer)
+    picture = Optional(memoryview)
     price = Required(Decimal)
     quantity = Required(int)
     cart_items = Set("CartItem")

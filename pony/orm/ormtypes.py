@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip
+from pony.py23compat import izip, memoryview
 
 import types
 from decimal import Decimal
@@ -61,7 +61,7 @@ class MethodType(object):
 numeric_types = set([ bool, int, float, Decimal ])
 string_types = set([ str, AsciiStr, unicode ])
 comparable_types = set([ int, float, Decimal, str, AsciiStr, unicode, date, datetime, bool, UUID ])
-primitive_types = set([ int, float, Decimal, str, AsciiStr, unicode, date, datetime, bool, buffer, UUID ])
+primitive_types = set([ int, float, Decimal, str, AsciiStr, unicode, date, datetime, bool, memoryview, UUID ])
 type_normalization_dict = { long : int, LongStr : str, LongUnicode : unicode }
 function_types = set([type, types.FunctionType, types.BuiltinFunctionType])
 
@@ -103,6 +103,7 @@ coercions = {
     (int, Decimal) : Decimal,
     (date, datetime) : datetime,
     (AsciiStr, str) : str,
+    (AsciiStr, memoryview) : str,
     (AsciiStr, unicode) : unicode,
     (bool, int) : int,
     (bool, float) : float,

@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function
+from pony.py23compat import memoryview
 
 from decimal import Decimal
 from datetime import date
@@ -35,7 +36,7 @@ class Student(db.Entity):
     name = Required(unicode)
     dob = Required(date)
     tel = Optional(str)
-    picture = Optional(buffer, lazy=True)
+    picture = Optional(memoryview, lazy=True)
     gpa = Required(float, default=0)
     group = Required(Group)
     courses = Set(Course)

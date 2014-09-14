@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from pony.py23compat import imap
+from pony.py23compat import imap, memoryview
 
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, time, timedelta
@@ -107,7 +107,7 @@ class MySQLProvider(DBAPIProvider):
         (long, MySQLLongConverter),
         (float, MySQLRealConverter),
         (Decimal, dbapiprovider.DecimalConverter),
-        (buffer, MySQLBlobConverter),
+        (memoryview, MySQLBlobConverter),
         (datetime, dbapiprovider.DatetimeConverter),
         (date, dbapiprovider.DateConverter),
         (UUID, MySQLUuidConverter),
@@ -134,7 +134,7 @@ class MySQLProvider(DBAPIProvider):
     def get_pool(provider, *args, **kwargs):
         if 'conv' not in kwargs:
             conv = MySQLdb.converters.conversions.copy()
-            conv[FIELD_TYPE.BLOB] = [(FLAG.BINARY, buffer)]
+            conv[FIELD_TYPE.BLOB] = [(FLAG.BINARY, memoryview)]
             conv[FIELD_TYPE.TIMESTAMP] = str2datetime
             conv[FIELD_TYPE.DATETIME] = str2datetime
             conv[FIELD_TYPE.TIME] = str2timedelta

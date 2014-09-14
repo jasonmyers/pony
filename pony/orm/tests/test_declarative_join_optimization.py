@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function, division
+from pony.py23compat import memoryview
 
 import unittest
 from datetime import date
@@ -31,7 +32,7 @@ class Student(db.Entity):
     id = PrimaryKey(int, auto=True)
     name = Required(unicode)
     dob = Required(date)
-    picture = Optional(buffer)
+    picture = Optional(memoryview)
     gpa = Required(float, default=0)
     group = Required(Group)
     courses = Set(Course)

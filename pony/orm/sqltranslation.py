@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, xrange
+from pony.py23compat import izip, xrange, memoryview
 
 import types, sys, re
 from itertools import count
@@ -1338,7 +1338,7 @@ class AttrMonad(Monad):
         elif type in string_types: cls = translator.StringAttrMonad
         elif type is date: cls = translator.DateAttrMonad
         elif type is datetime: cls = translator.DatetimeAttrMonad
-        elif type is buffer: cls = translator.BufferAttrMonad
+        elif type is memoryview: cls = translator.BufferAttrMonad
         elif isinstance(type, EntityMeta): cls = translator.ObjectAttrMonad
         else: throw(NotImplementedError, type)  # pragma: no cover
         return cls(parent, attr, *args, **kwargs)
@@ -1398,7 +1398,7 @@ class ParamMonad(Monad):
         elif type in string_types: cls = translator.StringParamMonad
         elif type is date: cls = translator.DateParamMonad
         elif type is datetime: cls = translator.DatetimeParamMonad
-        elif type is buffer: cls = translator.BufferParamMonad
+        elif type is memoryview: cls = translator.BufferParamMonad
         elif isinstance(type, EntityMeta): cls = translator.ObjectParamMonad
         else: throw(NotImplementedError, type)  # pragma: no cover
         result = cls(translator, type, paramkey)
@@ -1470,7 +1470,7 @@ class ConstMonad(Monad):
         elif value_type is date: cls = translator.DateConstMonad
         elif value_type is datetime: cls = translator.DatetimeConstMonad
         elif value_type is NoneType: cls = translator.NoneMonad
-        elif value_type is buffer: cls = translator.BufferConstMonad
+        elif value_type is memoryview: cls = translator.BufferConstMonad
         else: throw(NotImplementedError, value_type)  # pragma: no cover
         result = cls(translator, value)
         result.aggregated = False
@@ -1641,11 +1641,11 @@ class FuncMonad(Monad):
             reraise_improved_typeerror(exc, 'call', func.__name__)
 
 class FuncBufferMonad(FuncMonad):
-    func = buffer
+    func = memoryview
     def call(monad, x):
         translator = monad.translator
         if not isinstance(x, translator.StringConstMonad): throw(TypeError)
-        return translator.ConstMonad.new(translator, buffer(x.value))
+        return translator.ConstMonad.new(translator, memoryview(x.value))
 
 class FuncDecimalMonad(FuncMonad):
     func = Decimal

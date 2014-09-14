@@ -21,3 +21,9 @@ else:
 
     def itervalues(dict):
         return iter(dict.values())
+
+try:
+    memoryview = memoryview
+except NameError:
+    # Python 2.6
+    memoryview = buffer

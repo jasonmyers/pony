@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function, division
+from pony.py23compat import memoryview
 
 import unittest
 from decimal import Decimal
@@ -16,7 +17,7 @@ class Group(db.Entity):
 class Student(db.Entity):
     name = Required(unicode)
     scholarship = Required(Decimal, default=0)
-    picture = Optional(buffer, lazy=True)
+    picture = Optional(memoryview, lazy=True)
     email = Required(unicode, unique=True)
     phone = Optional(unicode, unique=True)
     courses = Set('Course')

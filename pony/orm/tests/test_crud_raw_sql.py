@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function, division
+from pony.py23compat import memoryview
 
 import unittest
 
@@ -21,7 +22,7 @@ class Group(db.Entity):
     PrimaryKey(dept, grad_year)
 
 class Bio(db.Entity):
-    picture = Optional(buffer)
+    picture = Optional(memoryview)
     desc = Required(unicode)
     Student = Required(Student)
 

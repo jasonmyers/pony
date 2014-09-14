@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from pony.py23compat import memoryview
 
 from decimal import Decimal
 from datetime import datetime, date
@@ -221,7 +222,7 @@ class PGProvider(DBAPIProvider):
         (int, dbapiprovider.IntConverter),
         (float, PGRealConverter),
         (Decimal, dbapiprovider.DecimalConverter),
-        (buffer, PGBlobConverter),
+        (memoryview, PGBlobConverter),
         (datetime, PGDatetimeConverter),
         (date, dbapiprovider.DateConverter),
         (UUID, PGUuidConverter),

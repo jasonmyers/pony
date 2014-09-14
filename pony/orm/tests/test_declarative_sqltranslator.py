@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function, division
+from pony.py23compat import memoryview
 
 import unittest
 from datetime import date
@@ -17,7 +18,7 @@ class Student(db.Entity):
     name = Required(unicode)
     group = Required('Group')
     scholarship = Required(int, default=0)
-    picture = Optional(bytes)
+    picture = Optional(memoryview)
     courses = Set('Course')
     grades = Set('Grade')
 
@@ -318,7 +319,7 @@ class TestSQLTranslator(unittest.TestCase):
         s1 = Student[1]
         result = set(select(g for g in Group if s1.name not in g.students.name))
         self.assertEqual(result, set([Group[2]]))
-    def test_bytes_monad1(self):
+    def test_memoryview_monad1(self):
         select(s for s in Student if s.picture == b'abc')
     def test_database_monad(self):
         result = set(select(s for s in db.Student if db.Student[1] == s))

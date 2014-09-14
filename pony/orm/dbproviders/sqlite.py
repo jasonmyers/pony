@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from pony.py23compat import imap
+from pony.py23compat import imap, memoryview
 
 import os.path
 import sqlite3 as sqlite
@@ -121,7 +121,7 @@ class SQLiteProvider(DBAPIProvider):
         ((int, long), dbapiprovider.IntConverter),
         (float, dbapiprovider.RealConverter),
         (Decimal, SQLiteDecimalConverter),
-        (buffer, dbapiprovider.BlobConverter),
+        (memoryview, dbapiprovider.BlobConverter),
         (datetime, SQLiteDatetimeConverter),
         (date, SQLiteDateConverter),
         (UUID, dbapiprovider.UuidConverter),

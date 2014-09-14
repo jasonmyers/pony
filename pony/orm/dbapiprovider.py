@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function, division
+from pony.py23compat import memoryview
 
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, date, time
@@ -528,11 +529,11 @@ class DecimalConverter(Converter):
 
 class BlobConverter(Converter):
     def validate(converter, val):
-        if isinstance(val, buffer): return val
-        if isinstance(val, str): return buffer(val)
-        throw(TypeError, "Attribute %r: expected type is 'buffer'. Got: %r" % (converter.attr, type(val)))
+        if isinstance(val, memoryview): return val
+        if isinstance(val, str): return memoryview(val)
+        throw(TypeError, "Attribute %r: expected type is 'memoryview'. Got: %r" % (converter.attr, type(val)))
     def sql2py(converter, val):
-        if not isinstance(val, buffer): val = buffer(val)
+        if not isinstance(val, memoryview): val = memoryview(val)
         return val
     def sql_type(converter):
         return 'BLOB'
@@ -603,7 +604,7 @@ class UuidConverter(Converter):
         Converter.__init__(converter, provider, py_type, attr)
     def validate(converter, val):
         if isinstance(val, UUID): return val
-        if isinstance(val, buffer): return UUID(bytes=val)
+        if isinstance(val, memoryview): return UUID(bytes=val)
         if isinstance(val, basestring):
             if len(val) == 16: return UUID(bytes=val)
             return UUID(hex=val)
@@ -613,7 +614,7 @@ class UuidConverter(Converter):
                                % (converter.attr, type(val)))
         else: throw(ValueError, 'Expected UUID value, got: %r' % type(val))
     def py2sql(converter, val):
-        return buffer(val.bytes)
+        return memoryview(val.bytes)
     sql2py = validate
     def sql_type(converter):
         return "UUID"

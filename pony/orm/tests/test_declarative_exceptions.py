@@ -1,4 +1,5 @@
 from __future__ import absolute_import, print_function, division
+from pony.py23compat import memoryview
 
 import unittest
 from datetime import date
@@ -150,10 +151,10 @@ class TestSQLTranslatorExceptions(unittest.TestCase):
     @raises_exception(ExprEvalError, "max() raises TypeError: max expected 1 arguments, got 0")
     def test31(self):
         select(s for s in Student if s.id < max())
-    #@raises_exception(TypeError, "Value of type 'buffer' is not valid as argument of 'max' function in expression max(x, y)")
+    #@raises_exception(TypeError, "Value of type 'memoryview' is not valid as argument of 'max' function in expression max(x, y)")
     # def test32(self):
-    #     x = buffer('a')
-    #     y = buffer('b')
+    #     x = memoryview('a')
+    #     y = memoryview('b')
     #    select(s for s in Student if max(x, y) == x)
     # @raises_exception(TypeError, "Incomparable types 'int' and 'AsciiStr' in expression: min(1, 'a')")
     # def test33(self):

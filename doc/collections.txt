@@ -8,7 +8,7 @@ When you need to define one-to-many or many-to-many relationship, you should use
         photos = Set('Photo')
 
     class Photo(db.Entity):
-        content = Required(buffer)
+        content = Required(memoryview)
         user = Required(User)
         tags = Set('Tag')
 
