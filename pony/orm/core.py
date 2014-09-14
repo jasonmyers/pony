@@ -2284,6 +2284,7 @@ class SetWrapper(object):
         elif not isinstance(other, set): other = set(other)
         items = wrapper.copy()
         return items == other
+    __hash__ = None
     @cut_traceback
     def __ne__(wrapper, other):
         return not wrapper.__eq__(other)
@@ -2474,6 +2475,7 @@ class Multiset(object):
         if hasattr(other, 'keys'):
             return multiset._items_ == dict(other)
         return multiset._items_ == _distinct(other)
+    __hash__ = None
     @cut_traceback
     def __ne__(multiset, other):
         return not multiset.__eq__(other)
