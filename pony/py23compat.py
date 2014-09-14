@@ -40,6 +40,24 @@ def func_code(func):
     else:
         return func.__code__
 
+def im_func(method):
+    if PY2:
+        return method.im_func
+    else:
+        return method.__func__
+
+def im_self(method):
+    if PY2:
+        return method.im_self
+    else:
+        return method.__self__
+
+def im_class(method):
+    if PY2:
+        return method.im_class
+    else:
+        return method.__self__.__class__
+
 try:
     import cPickle as pickle
 except ImportError:

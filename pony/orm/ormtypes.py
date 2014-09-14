@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, memoryview
+from pony.py23compat import izip, memoryview, im_func, im_self
 
 import types
 from decimal import Decimal
@@ -49,8 +49,8 @@ class MethodType(object):
     def __deepcopy__(self, memo):
         return self  # MethodType instances are "immutable"
     def __init__(self, method):
-        self.obj = method.im_self
-        self.func = method.im_func
+        self.obj = im_self(method)
+        self.func = im_func(method)
     def __eq__(self, other):
         return isinstance(other, MethodType) and self.obj == other.obj and self.func == other.func
     def __ne__(self, other):

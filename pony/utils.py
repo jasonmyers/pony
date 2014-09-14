@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from pony.py23compat import imap
+from pony.py23compat import imap, im_func, im_self, im_class
 
 import re, os.path, sys, types, warnings
 
@@ -15,7 +15,7 @@ from xml.etree import cElementTree
 # deepcopy instance method patch for Python < 2.7:
 if types.MethodType not in _deepcopy_dispatch:
     def _deepcopy_method(x, memo):
-        return type(x)(x.im_func, deepcopy(x.im_self, memo), x.im_class)
+        return type(x)(im_func(x), deepcopy(im_self(x), memo), im_class(x))
     _deepcopy_dispatch[types.MethodType] = _deepcopy_method
 
 import pony
