@@ -61,8 +61,8 @@ def join_tables(alias1, alias2, columns1, columns2):
     return sqland([ [ 'EQ', [ 'COLUMN', alias1, c1 ], [ 'COLUMN', alias2, c2 ] ] for c1, c2 in izip(columns1, columns2) ])
 
 def type2str(t):
-    if type(t) is tuple: return 'list'
-    if type(t) is SetType: return 'Set of ' + type2str(t.item_type)
+    if isinstance(t, tuple): return 'list'
+    if isinstance(t, SetType): return 'Set of ' + type2str(t.item_type)
     try: return t.__name__
     except: return str(t)
 
@@ -589,7 +589,7 @@ class SQLTranslator(ASTTranslator):
         return translator.AndMonad(monads)
     def postConst(translator, node):
         value = node.value
-        if type(value) is not tuple:
+        if not isinstance(value, tuple):
             return translator.ConstMonad.new(translator, value)
         else:
             return translator.ListMonad(translator, [ translator.ConstMonad.new(translator, item) for item in value ])
@@ -1618,7 +1618,7 @@ class FuncMonadMeta(MonadMeta):
         func = cls_dict.get('func')
         monad_cls = super(FuncMonadMeta, meta).__new__(meta, cls_name, bases, cls_dict)
         if func:
-            if type(func) is tuple: functions = func
+            if isinstance(func, tuple): functions = func
             else: functions = (func,)
             for func in functions: special_functions[func] = monad_cls
         return monad_cls
@@ -1637,7 +1637,7 @@ class FuncMonad(Monad):
         try: return monad.call(*args, **kwargs)
         except TypeError as exc:
             func = monad.func
-            if type(func) is tuple: func = func[0]
+            if isinstance(func, tuple): func = func[0]
             reraise_improved_typeerror(exc, 'call', func.__name__)
 
 class FuncBufferMonad(FuncMonad):
@@ -1845,7 +1845,7 @@ class AttrSetMonad(SetMixin, Monad):
         monad.tableref = None
     def cmp(monad, op, monad2):
         translator = monad.translator
-        if type(monad2.type) is SetType \
+        if isinstance(monad2.type, SetType) \
            and are_comparable_types(monad.type.item_type, monad2.type.item_type): pass
         elif monad.type != monad2.type: check_comparable(monad, monad2)
         throw(NotImplementedError)
@@ -2141,7 +2141,7 @@ def make_numericset_binop(op, sqlop):
 class NumericSetExprMonad(SetMixin, Monad):
     def __init__(monad, op, sqlop, left, right):
         result_type, left, right = coerce_monads(left, right)
-        assert type(result_type) is SetType
+        assert isinstance(result_type, SetType)
         if result_type.item_type not in numeric_types:
             throw(TypeError, _binop_errmsg % (type2str(left.type), type2str(right.type), op))
         Monad.__init__(monad, left.translator, result_type)

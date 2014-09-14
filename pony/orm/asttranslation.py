@@ -150,7 +150,7 @@ class PythonTranslator(ASTTranslator):
         node.priority = 2
         if len(node.subs) == 1:
             sub = node.subs[0]
-            if isinstance(sub, ast.Const) and type(sub.value) is tuple and len(sub.value) > 1:
+            if isinstance(sub, ast.Const) and isinstance(sub.value, tuple) and len(sub.value) > 1:
                 key = sub.src
                 assert key.startswith('(') and key.endswith(')')
                 key = key[1:-1]
@@ -167,7 +167,7 @@ class PythonTranslator(ASTTranslator):
     def postConst(translator, node):
         node.priority = 1
         value = node.value
-        if type(value) is float: # for Python < 2.7
+        if isinstance(value, float): # for Python < 2.7
             s = str(value)
             if float(s) == value: return s
         return repr(value)

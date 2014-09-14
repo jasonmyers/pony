@@ -25,9 +25,9 @@ class SetType(object):
     def __init__(self, item_type):
         self.item_type = item_type
     def __eq__(self, other):
-        return type(other) is SetType and self.item_type == other.item_type
+        return isinstance(other, SetType) and self.item_type == other.item_type
     def __ne__(self, other):
-        return type(other) is not SetType or self.item_type != other.item_type
+        return not isinstance(other, SetType) or self.item_type != other.item_type
     def __hash__(self):
         return hash(self.item_type) + 1
 
@@ -38,9 +38,9 @@ class FuncType(object):
     def __init__(self, func):
         self.func = func
     def __eq__(self, other):
-        return type(other) is FuncType and self.func == other.func
+        return isinstance(other, FuncType) and self.func == other.func
     def __ne__(self, other):
-        return type(other) is not FuncType or self.func != other.func
+        return not isinstance(other, FuncType) or self.func != other.func
     def __hash__(self):
         return hash(self.func) + 1
 
@@ -52,9 +52,9 @@ class MethodType(object):
         self.obj = method.im_self
         self.func = method.im_func
     def __eq__(self, other):
-        return type(other) is MethodType and self.obj == other.obj and self.func == other.func
+        return isinstance(other, MethodType) and self.obj == other.obj and self.func == other.func
     def __ne__(self, other):
-        return type(other) is not SetType or self.obj != other.obj or self.func != other.func
+        return not isinstance(other, SetType) or self.obj != other.obj or self.func != other.func
     def __hash__(self):
         return hash(self.obj) ^ hash(self.func)
 
@@ -113,10 +113,10 @@ coercions.update(((t2, t1), t3) for ((t1, t2), t3) in coercions.items())
 def coerce_types(t1, t2):
     if t1 == t2: return t1
     is_set_type = False
-    if type(t1) is SetType:
+    if isinstance(t1, SetType):
         is_set_type = True
         t1 = t1.item_type
-    if type(t2) is SetType:
+    if isinstance(t2, SetType):
         is_set_type = True
         t2 = t2.item_type
     result = coercions.get((t1, t2))

@@ -224,7 +224,7 @@ class DBAPIProvider(object):
 
     @wrap_dbapi_exceptions
     def execute(provider, cursor, sql, arguments=None, returning_id=False):
-        if type(arguments) is list:
+        if isinstance(arguments, list):
             assert arguments and not returning_id
             cursor.executemany(sql, arguments)
         else:

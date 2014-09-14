@@ -111,8 +111,7 @@ class TestSQLTranslator(unittest.TestCase):
     def test_select_composite_key(self):
         grade1 = Grade[Student[1], Course['Physics', 2]]
         result = select(g for g in Grade if g != grade1)
-        grades = [ grade.value for grade in result ]
-        grades.sort()
+        grades = sorted([ grade.value for grade in result ])
         self.assertEqual(grades, ['B', 'C'])
     def test_function_max1(self):
         result = select(s for s in Student if max(s.grades.value) == 'C')[:]

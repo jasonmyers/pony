@@ -97,7 +97,7 @@ lambda_args_cache = {}
 def get_lambda_args(func):
     names = lambda_args_cache.get(func)
     if names is not None: return names
-    if type(func) is types.FunctionType:
+    if isinstance(func, types.FunctionType):
         names, argsname, kwname, defaults = getargspec(func)
     elif isinstance(func, ast.Lambda):
         names = func.argnames
@@ -262,7 +262,7 @@ def tostring(x):
     except: pass
     try: return repr(x)
     except: pass
-    if type(x) == types.InstanceType: return '<%s instance at 0x%X>' % (x.__class__.__name__)
+    if isinstance(x, types.InstanceType): return '<%s instance at 0x%X>' % (x.__class__.__name__)
     return '<%s object at 0x%X>' % (x.__class__.__name__)
 
 def strjoin(sep, strings, source_encoding='ascii', dest_encoding=None):

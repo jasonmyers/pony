@@ -85,14 +85,14 @@ def log_orm(msg):
         print(msg)
 
 def log_sql(sql, arguments=None):
-    if type(arguments) is list:
+    if isinstance(arguments, list):
         sql = 'EXECUTEMANY (%d)\n%s' % (len(arguments), sql)
     if logging.root.handlers:
         sql_logger.log(orm_log_level, sql)  # arguments can hold sensitive information
     else:
         print(sql)
         if not arguments: pass
-        elif type(arguments) is list:
+        elif isinstance(arguments, list):
             for args in arguments: print(args2str(args))
         else: print(args2str(arguments))
         print()
@@ -124,7 +124,7 @@ class TooManyRowsFound(OrmError): pass
 
 class ObjectNotFound(OrmError):
     def __init__(exc, entity, pkval):
-        if type(pkval) is tuple:
+        if isinstance(pkval, tuple):
             pkval = ','.join(imap(repr, pkval))
         else: pkval = repr(pkval)
         msg = '%s[%s]' % (entity.__name__, pkval)
@@ -309,7 +309,7 @@ class DBSessionContextManager(object):
     def __init__(self, retry=0, immediate=False, ddl=False, serializable=False,
                  retry_exceptions=(TransactionError,), allowed_exceptions=()):
         if retry is not 0:
-            if type(retry) is not int: throw(TypeError,
+            if not isinstance(retry, int): throw(TypeError,
                 "'retry' parameter of db_session must be of integer type. Got: %s" % type(retry))
             if retry < 0: throw(TypeError,
                 "'retry' parameter of db_session must not be negative. Got: %d" % retry)
@@ -592,7 +592,7 @@ class Database(object):
         if cache.immediate: cache.in_transaction = True
         database._update_local_stat(sql, t)
         if not returning_id: return cursor
-        if type(new_id) is long: new_id = int(new_id)
+        if isinstance(new_id, long): new_id = int(new_id)
         return new_id
     @cut_traceback
     def generate_mapping(database, filename=None, check_tables=True, create_tables=False):
@@ -1099,9 +1099,9 @@ class DescWrapper(object):
     def __call__(self):
         return self
     def __eq__(self, other):
-        return type(other) is DescWrapper and self.attr == other.attr
+        return isinstance(other, DescWrapper) and self.attr == other.attr
     def __ne__(self, other):
-        return type(other) is not DescWrapper or self.attr != other.attr
+        return not isinstance(other, DescWrapper) or self.attr != other.attr
     def __hash__(self):
         return hash(self.attr) + 1
 
@@ -1137,7 +1137,7 @@ class Attribute(object):
                 'datetime is the module and cannot be used as attribute type. Use datetime.datetime instead')
             throw(TypeError, 'Incorrect type of attribute: %r' % py_type)
         attr.py_type = py_type
-        attr.is_string = type(py_type) is type and issubclass(py_type, basestring)
+        attr.is_string = isinstance(py_type, type) and issubclass(py_type, basestring)
         attr.is_collection = isinstance(attr, Collection)
         attr.is_relation = isinstance(attr.py_type, (EntityMeta, basestring, types.FunctionType))
         attr.is_basic = not attr.is_collection and not attr.is_relation
@@ -1267,12 +1267,12 @@ class Attribute(object):
                         vrepr = repr(val)
                         if len(vrepr) > 100: vrepr = vrepr[:97] + '...'
                         raise ValueError('Value for attribute %s cannot be converted to unicode: %s' % (attr, vrepr))
-            if type(val) is attr.py_type: return val
+            if isinstance(val, attr.py_type): return val
             return attr.py_type(val)
 
         rentity = reverse.entity
         if not isinstance(val, rentity):
-            if type(val) is not tuple: val = (val,)
+            if not isinstance(val, tuple): val = (val,)
             if len(val) != len(rentity._pk_columns_): throw(ConstraintError,
                 'Invalid number of columns were specified for attribute %s. Expected: %d, got: %d'
                 % (attr, len(rentity._pk_columns_), len(val)))
@@ -1608,7 +1608,7 @@ class Discriminator(Required):
             discr_value = entity._discriminator_ = entity.__name__
         discr_type = type(discr_value)
         for code, cls in attr.code2cls.items():
-            if type(code) != discr_type: throw(ERDiagramError,
+            if not isinstance(code, discr_type): throw(ERDiagramError,
                 'Discriminator values %r and %r of entities %s and %s have different types'
                 % (code, discr_value, cls, entity))
         attr.code2cls[discr_value] = entity
@@ -1661,7 +1661,7 @@ class PrimaryKey(Required):
             for key, val in iteritems(cls_dict):
                 if val is attr: attr_name = key; break
             py_type = attr.py_type
-            type_str = py_type.__name__ if type(py_type) is type else repr(py_type)
+            type_str = py_type.__name__ if isinstance(py_type, type) else repr(py_type)
             throw(TypeError, 'Just use %s = PrimaryKey(%s, ...) directly instead of PrimaryKey(%s)'
                   % (attr_name, type_str, attr_name))
 
@@ -2436,7 +2436,7 @@ class Multiset(object):
     def __init__(multiset, obj, attrnames, items):
         multiset._obj_ = obj
         multiset._attrnames_ = attrnames
-        if type(items) is dict: multiset._items_ = items
+        if isinstance(items, dict): multiset._items_ = items
         else: multiset._items_ = _distinct(items)
     def __reduce__(multiset):
         return unpickle_multiset, (multiset._obj_, multiset._attrnames_, multiset._items_)
@@ -2806,7 +2806,7 @@ class EntityMeta(type):
         return pkval, avdict
     @cut_traceback
     def __getitem__(entity, key):
-        if type(key) is not tuple: key = (key,)
+        if not isinstance(key, tuple): key = (key,)
         if len(key) != len(entity._pk_attrs_):
             throw(TypeError, 'Invalid count of attrs in %s primary key (%s instead of %s)'
                              % (entity.__name__, len(key), len(entity._pk_attrs_)))
@@ -2846,7 +2846,7 @@ class EntityMeta(type):
     def select(entity, func=None):
         if func is None:
             return Query(entity._default_iter_name_, entity._default_genexpr_, {}, { '.0' : entity })
-        if not (type(func) is types.FunctionType or isinstance(func, basestring) and lambda_re.match(func)):
+        if not (isinstance(func, types.FunctionType) or isinstance(func, basestring) and lambda_re.match(func)):
             throw(TypeError, 'Lambda function or its text representation expected. Got: %r' % func)
         return entity._query_from_lambda_(func, frame_depth=3)
     @cut_traceback
@@ -3184,14 +3184,14 @@ class EntityMeta(type):
         if len(args) > 1: throw(TypeError, 'Only one positional argument expected')
         if kwargs: throw(TypeError, 'If positional argument presented, no keyword arguments expected')
         func = args[0]
-        if not (type(func) is types.FunctionType or isinstance(func, basestring) and lambda_re.match(func)):
+        if not (isinstance(func, types.FunctionType) or isinstance(func, basestring) and lambda_re.match(func)):
             throw(TypeError, 'Positional argument must be lambda function or its text source. '
                              'Got: %s.get(%r)' % (entity.__name__, func))
         return entity._query_from_lambda_(func, frame_depth+1)
     def _query_from_lambda_(entity, lambda_func, frame_depth):
         globals = sys._getframe(frame_depth+1).f_globals
         locals = sys._getframe(frame_depth+1).f_locals
-        if type(lambda_func) is types.FunctionType:
+        if isinstance(lambda_func, types.FunctionType):
             names = get_lambda_args(lambda_func)
             code_key = id(lambda_func.func_code)
             cond_expr, external_names, cells = decompile(lambda_func)
@@ -4064,7 +4064,7 @@ def make_aggrfunc(std_func):
         if kwargs: return std_func(*args, **kwargs)
         if len(args) != 1: return std_func(*args)
         arg = args[0]
-        if type(arg) is types.GeneratorType:
+        if isinstance(arg, types.GeneratorType):
             try: iterator = arg.gi_frame.f_locals['.0']
             except: return std_func(*args)
             if isinstance(iterator, EntityIter):
@@ -4272,7 +4272,7 @@ class Query(object):
                 if obj not in object_set:
                     add_to_object_set(obj)
                     append_to_object_list(obj)
-        elif type(expr_type) is tuple:
+        elif isinstance(expr_type, tuple):
             indexes = [ i for i, t in enumerate(expr_type) if isinstance(t, EntityMeta) ]
             for i in indexes:
                 for row in query._result:
@@ -4331,7 +4331,7 @@ class Query(object):
     def first(query):
         translator = query._translator
         if translator.order: pass
-        elif type(translator.expr_type) is tuple:
+        elif isinstance(translator.expr_type, tuple):
             query = query.order_by(*[i+1 for i in xrange(len(query._translator.expr_type))])
         else:
             query = query.order_by(1)
@@ -4371,7 +4371,7 @@ class Query(object):
         attributes = functions = strings = numbers = False
         for arg in args:
             if isinstance(arg, basestring): strings = True
-            elif type(arg) is types.FunctionType: functions = True
+            elif isinstance(arg, types.FunctionType): functions = True
             elif isinstance(arg, (int, long)): numbers = True
             elif isinstance(arg, (Attribute, DescWrapper)): attributes = True
             else: throw(TypeError, "Arguments of order_by() method must be attributes, numbers, strings or lambdas. Got: %r" % arg)
@@ -4403,7 +4403,7 @@ class Query(object):
                 argnames = get_lambda_args(func_ast)
                 func_ast = func_ast.code
             cells = None
-        elif type(func) is types.FunctionType:
+        elif isinstance(func, types.FunctionType):
             argnames = get_lambda_args(func)
             subquery = query._translator.subquery
             func_id = id(func.func_code)
@@ -4414,7 +4414,7 @@ class Query(object):
 
         if argnames:
             expr_type = query._translator.expr_type
-            expr_count = len(expr_type) if type(expr_type) is tuple else 1
+            expr_count = len(expr_type) if isinstance(expr_type, tuple) else 1
             if len(argnames) != expr_count:
                 throw(TypeError, 'Incorrect number of lambda arguments. '
                                  'Expected: %d, got: %d' % (expr_count, len(argnames)))

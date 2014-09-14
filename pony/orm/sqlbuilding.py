@@ -125,7 +125,7 @@ def convert(values, params):
         varkey, i, j = param.paramkey
         value = values[varkey]
         if i is not None:
-            assert type(value) is tuple
+            assert isinstance(value, tuple)
             value = value[i]
         if j is not None:
             assert type(type(value)).__name__ == 'EntityMeta'

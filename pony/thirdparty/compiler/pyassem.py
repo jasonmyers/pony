@@ -129,7 +129,7 @@ def order_blocks(start_block, exit_block):
         dominators.setdefault(b, set())
         # preceding blocks dominate following blocks
         for c in b.get_followers():
-            while 1:
+            while True:
                 dominators.setdefault(c, set()).add(b)
                 # Any block that has a next pointer leading to c is also
                 # dominated because the whole chain will be emitted at once.
@@ -150,7 +150,7 @@ def order_blocks(start_block, exit_block):
         assert 0, 'circular dependency, cannot find next block'
 
     b = start_block
-    while 1:
+    while True:
         order.append(b)
         remaining.discard(b)
         if b.next:
@@ -278,11 +278,10 @@ class PyFlowGraph(FlowGraph):
         # The offsets used by LOAD_CLOSURE/LOAD_DEREF refer to both
         # kinds of variables.
         self.closure = []
-        self.varnames = list(args) or []
-        for i in range(len(self.varnames)):
-            var = self.varnames[i]
-            if isinstance(var, TupleArg):
-                self.varnames[i] = var.getName()
+        self.varnames = [
+            var.getName() if isinstance(var, TupleArg) else var
+            for var in args or []
+        ]
         self.stage = RAW
 
     def setDocstring(self, doc):
@@ -440,8 +439,8 @@ class PyFlowGraph(FlowGraph):
         comparison before comparing the values.
         """
         t = type(name)
-        for i in range(len(list)):
-            if t == type(list[i]) and list[i] == name:
+        for i, n in enumerate(list):
+            if isinstance(n, t) and n == name:
                 return i
         end = len(list)
         list.append(name)

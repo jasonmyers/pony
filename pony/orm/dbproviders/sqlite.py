@@ -79,7 +79,7 @@ class SQLiteDecimalConverter(dbapiprovider.DecimalConverter):
         if exp is not None: val = val.quantize(exp)
         return val
     def py2sql(converter, val):
-        if type(val) is not Decimal: val = Decimal(val)
+        if not isinstance(val, Decimal): val = Decimal(val)
         exp = converter.exp
         if exp is not None: val = val.quantize(exp)
         return str(val)

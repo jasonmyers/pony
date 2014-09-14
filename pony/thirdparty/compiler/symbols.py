@@ -279,7 +279,7 @@ class SymbolVisitor:
 
     def _do_args(self, scope, args):
         for name in args:
-            if type(name) == types.TupleType:
+            if isinstance(name, types.TupleType):
                 self._do_args(scope, name)
             else:
                 scope.add_param(name)

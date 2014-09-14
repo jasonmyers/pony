@@ -100,7 +100,7 @@ class TestDatabase(Database):
     def _execute(database, sql, globals, locals, frame_depth):
         assert False
     def _exec_sql(database, sql, arguments=None, returning_id=False):
-        assert type(arguments) is not list and not returning_id
+        assert not isinstance(arguments, list) and not returning_id
         database.sql = sql
         database.arguments = arguments
         return test_cursor

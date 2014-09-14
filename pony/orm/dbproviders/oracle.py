@@ -344,7 +344,7 @@ class OraProvider(DBAPIProvider):
 
     @wrap_dbapi_exceptions
     def execute(provider, cursor, sql, arguments=None, returning_id=False):
-        if type(arguments) is list:
+        if isinstance(arguments, list):
             assert arguments and not returning_id
             set_input_sizes(cursor, arguments[0])
             cursor.executemany(sql, arguments)
@@ -471,13 +471,13 @@ def get_inputsize(arg):
     return None
 
 def set_input_sizes(cursor, arguments):
-    if type(arguments) is dict:
+    if isinstance(arguments, dict):
         input_sizes = {}
         for name, arg in iteritems(arguments):
             size = get_inputsize(arg)
             if size is not None: input_sizes[name] = size
         cursor.setinputsizes(**input_sizes)
-    elif type(arguments) is tuple:
+    elif isinstance(arguments, tuple):
         input_sizes = map(get_inputsize, arguments)
         cursor.setinputsizes(*input_sizes)
     else: assert False, type(arguments)
