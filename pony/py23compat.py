@@ -39,3 +39,18 @@ def func_code(func):
         return func.func_code
     else:
         return func.__code__
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+try:
+    import builtins
+except ImportError:
+    import __builtin__ as builtins

@@ -1,15 +1,19 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, imap, iteritems, itervalues, xrange, func_code
+from pony.py23compat import (
+    izip, imap, iteritems, itervalues, xrange, func_code, builtins, pickle
+    )
+
+_min = builtins.min
+_max = builtins.max
+_sum = builtins.sum
 
 import re, sys, types, logging
-from cPickle import loads, dumps
 from operator import attrgetter, itemgetter
 from itertools import count as _count, chain, starmap, repeat
 from time import time
 import datetime
 from random import shuffle, randint
 from threading import Lock, currentThread as current_thread, _MainThread
-from __builtin__ import min as _min, max as _max, sum as _sum
 from contextlib import contextmanager
 from collections import defaultdict
 
@@ -4155,13 +4159,13 @@ class Query(object):
 
         translator = database._translator_cache.get(query._key)
         if translator is None:
-            pickled_tree = query._pickled_tree = dumps(tree, 2)
-            tree = loads(pickled_tree)  # tree = deepcopy(tree)
+            pickled_tree = query._pickled_tree = pickle.dumps(tree, 2)
+            tree = pickle.loads(pickled_tree)  # tree = deepcopy(tree)
             translator_cls = database.provider.translator_cls
             translator = translator_cls(tree, extractors, vartypes, left_join=left_join)
             name_path = translator.can_be_optimized()
             if name_path:
-                tree = loads(pickled_tree)  # tree = deepcopy(tree)
+                tree = pickle.loads(pickled_tree)  # tree = deepcopy(tree)
                 try: translator = translator_cls(tree, extractors, vartypes, left_join=True, optimize=name_path)
                 except OptimizationFailed: translator.optimization_failed = True
             database._translator_cache[query._key] = translator
@@ -4439,7 +4443,7 @@ class Query(object):
             if not prev_optimized:
                 name_path = new_translator.can_be_optimized()
                 if name_path:
-                    tree = loads(query._pickled_tree)  # tree = deepcopy(tree)
+                    tree = pickle.loads(query._pickled_tree)  # tree = deepcopy(tree)
                     prev_extractors = query._translator.extractors
                     prev_vartypes = query._translator.vartypes
                     translator_cls = query._translator.__class__

@@ -1,12 +1,11 @@
 from __future__ import print_function
-from pony.py23compat import izip
+from pony.py23compat import izip, StringIO
 
 import imp
 import os
 import marshal
 import struct
 import sys
-from cStringIO import StringIO
 
 from . import ast, parse, walk, syntax
 from . import pyassem, misc, future, symbols
