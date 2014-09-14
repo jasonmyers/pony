@@ -121,7 +121,7 @@ class Table(DBObject):
             cmd.append(schema.indent + column.get_sql() + ',')
         if len(table.pk_index.columns) > 1:
             cmd.append(schema.indent + table.pk_index.get_sql() + ',')
-        for index in sorted(itervalues(table.indexes), key=lambda index: index.name):
+        for index in sorted(itervalues(table.indexes), key=lambda index: index.name or ''):
             if index.is_pk: continue
             if not index.is_unique: continue
             if len(index.columns) == 1: continue
@@ -136,7 +136,7 @@ class Table(DBObject):
     def get_objects_to_create(table, created_tables=None):
         if created_tables is None: created_tables = set()
         result = [ table ]
-        for index in sorted(itervalues(table.indexes), key=lambda index: index.name):
+        for index in sorted(itervalues(table.indexes), key=lambda index: index.name or ''):
             if index.is_pk or index.is_unique: continue
             assert index.name is not None
             result.append(index)
