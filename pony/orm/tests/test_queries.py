@@ -15,11 +15,11 @@ lines = []
 
 def Schema(param):
     if not statement_used:
-        print()
+        print('')
         print('Statement not used:')
-        print()
+        print('')
         print('\n'.join(statements))
-        print()
+        print('')
         sys.exit()
     assert len(lines) == 1
     global module_name
@@ -47,9 +47,9 @@ def do_test(provider_name, raw_server_version):
     sys.modules.pop(module_name, None)
     try: __import__(module_name)
     except ImportError as e:
-        print()
+        print('')
         print('ImportError for database provider %s:\n%s' % (provider_name, e))
-        print()
+        print('')
         unavailable_providers.add(provider_name)
         return
     module = sys.modules[module_name]
@@ -71,13 +71,13 @@ def do_test(provider_name, raw_server_version):
     if sql == expected_sql: print('+', provider_name, statements[-1])
     else:
         print('-', provider_name, statements[-1])
-        print()
+        print('')
         print('Expected:')
         print(expected_sql)
-        print()
+        print('')
         print('Got:')
         print(sql)
-        print()
+        print('')
     global statement_used
     statement_used = True
 

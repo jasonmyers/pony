@@ -66,7 +66,7 @@ def show_all_persons():
         print(obj)
         for attr in obj._attrs_:
             print(attr.name, "=", attr.__get__(obj))
-        print()
+        print('')
 
 if __name__ == '__main__':
     populate_database()
@@ -82,7 +82,7 @@ if __name__ == '__main__':
             mentor = s1.mentor
             print(mentor.name, 'is mentor of Student1')
             print('Is he assistant?', isinstance(mentor, Assistant))
-        print()
+        print('')
 
         for s in Student.select(lambda s: s.mentor.salary == 1000):
             print(s.name)

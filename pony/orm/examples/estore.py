@@ -165,114 +165,114 @@ def populate_database():
 def test_queries():
 
     print('All USA customers')
-    print()
+    print('')
     result = select(c for c in Customer if c.country == 'USA')[:]
 
     print(result)
-    print()
+    print('')
 
     print('The number of customers for each country')
-    print()
+    print('')
     result = select((c.country, count(c)) for c in Customer)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Max product price')
-    print()
+    print('')
     result = max(p.price for p in Product)
 
     print(result)
-    print()
+    print('')
 
     print('Max SSD price')
-    print()
+    print('')
     result = max(p.price for p in Product for cat in p.categories if cat.name == 'Solid State Drives')
 
     print(result)
-    print()
+    print('')
 
     print('Three most expensive products:')
-    print()
+    print('')
     result = select(p for p in Product).order_by(desc(Product.price))[:3]
 
     print(result)
-    print()
+    print('')
 
     print('Out of stock products')
-    print()
+    print('')
     result = select(p for p in Product if p.quantity == 0)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Most popular product')
-    print()
+    print('')
     result = select(p for p in Product).order_by(lambda p: desc(sum(p.order_items.quantity))).first()
 
     print(result)
-    print()
+    print('')
 
     print('Products that have never been ordered')
-    print()
+    print('')
     result = select(p for p in Product if not p.order_items)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Customers who made several orders')
-    print()
+    print('')
     result = select(c for c in Customer if count(c.orders) > 1)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Three most valuable customers')
-    print()
+    print('')
     result = select(c for c in Customer).order_by(lambda c: desc(sum(c.orders.total_price)))[:3]
     
     print(result)
-    print()
+    print('')
 
     print('Customers whose orders were shipped')
-    print()
+    print('')
     result = select(c for c in Customer if SHIPPED in c.orders.state)[:]
 
     print(result)
-    print()
+    print('')
 
     print('The same query with the INNER JOIN instead of IN')
-    print()
+    print('')
     result = select(c for c in Customer if JOIN(SHIPPED in c.orders.state))[:]
 
     print(result)
-    print()
+    print('')
 
     print('Customers with no orders')
-    print()
+    print('')
     result = select(c for c in Customer if not c.orders)[:]
 
     print(result)
-    print()
+    print('')
 
     print('The same query with the LEFT JOIN instead of NOT EXISTS')
-    print()
+    print('')
     result = left_join(c for c in Customer for o in c.orders if o is None)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Customers which ordered several different tablets')
-    print()
+    print('')
     result = select(c for c in Customer
                       for p in c.orders.items.product
                       if 'Tablets' in p.categories.name and count(p) > 1)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Customers which ordered several products from the same category')
-    print()
+    print('')
     result = select((customer, category.name)
                     for customer in Customer
                     for product in customer.orders.items.product
@@ -280,10 +280,10 @@ def test_queries():
                     if count(product) > 1)[:]    
 
     print(result)
-    print()
+    print('')
 
     print('Customers which ordered several products from the same category in the same order')
-    print()
+    print('')
     result = select((customer, order, category.name)
                     for customer in Customer
                     for order in customer.orders
@@ -292,29 +292,29 @@ def test_queries():
                     if count(product) > 1)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Products whose price varies over time')
-    print()
+    print('')
     result = select(p.name for p in Product if count(p.order_items.price) > 1)[:]
 
     print(result)
-    print()
+    print('')
 
     print('The same query, but with min and max price for each product')
-    print()
+    print('')
     result = select((p.name, min(p.order_items.price), max(p.order_items.price))
                     for p in Product if count(p.order_items.price) > 1)[:]
 
     print(result)
-    print()
+    print('')
 
     print('Orders with a discount (order total price < sum of order item prices)')
-    print()
+    print('')
     result = select(o for o in Order if o.total_price < sum(o.items.price * o.items.quantity))[:]
 
     print(result)
-    print()
+    print('')
 
 
 if __name__ == '__main__':

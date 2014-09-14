@@ -514,21 +514,21 @@ def test():
         ast1.code.quals[0].iter.name = outmost_iterable_name
         try: ast2 = Decompiler(code).ast
         except Exception as e:
-            print()
+            print('')
             print(line)
-            print()
+            print('')
             print(ast1)
-            print()
+            print('')
             dis.dis(code)
             raise
         if str(ast1) != str(ast2):
-            print()
+            print('')
             print(line)
-            print()
+            print('')
             print(ast1)
-            print()
+            print('')
             print(ast2)
-            print()
+            print('')
             dis.dis(code)
             break
         else: print('OK: %s' % line)

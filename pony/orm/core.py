@@ -99,7 +99,7 @@ def log_sql(sql, arguments=None):
         elif isinstance(arguments, list):
             for args in arguments: print(args2str(args))
         else: print(args2str(arguments))
-        print()
+        print('')
 
 def args2str(args):
     if isinstance(args, (tuple, list)):
@@ -4659,7 +4659,7 @@ def show(entity):
         #     if attr.is_collection or attr.lazy: continue
         #     value = str(attr.__get__(x)).replace('\n', ' ')
         #     print('  %s: %s' % (attr.name, strcut(value, width-len(attr.name)-4)))
-        # print()
+        # print('')
         QueryResult([ x ], x.__class__, None).show()
     elif isinstance(x, (basestring, types.GeneratorType)):
         select(x).show()
