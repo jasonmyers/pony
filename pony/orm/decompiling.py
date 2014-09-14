@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, xrange
+from pony.py23compat import izip, xrange, func_code, func_closure
 
 import types
 from opcode import opname as opnames, HAVE_ARGUMENT, EXTENDED_ARG, cmp_op
@@ -22,8 +22,8 @@ def decompile(x):
     if t is types.CodeType: codeobject = x
     elif t is types.GeneratorType: codeobject = x.gi_frame.f_code
     elif t is types.FunctionType:
-        codeobject = x.func_code
-        if x.func_closure: cells = dict(izip(codeobject.co_freevars, x.func_closure))
+        codeobject = func_code(x)
+        if func_closure(x): cells = dict(izip(codeobject.co_freevars, func_closure(x)))
     else: throw(TypeError)
     key = id(codeobject)
     result = ast_cache.get(key)

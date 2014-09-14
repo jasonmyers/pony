@@ -27,3 +27,15 @@ try:
 except NameError:
     # Python 2.6
     memoryview = buffer
+
+def func_closure(func):
+    if PY2:
+        return func.func_closure
+    else:
+        return func.__closure__
+
+def func_code(func):
+    if PY2:
+        return func.func_code
+    else:
+        return func.__code__

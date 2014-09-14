@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, imap, iteritems, itervalues, xrange
+from pony.py23compat import izip, imap, iteritems, itervalues, xrange, func_code
 
 import re, sys, types, logging
 from cPickle import loads, dumps
@@ -3194,7 +3194,7 @@ class EntityMeta(type):
         locals = sys._getframe(frame_depth+1).f_locals
         if isinstance(lambda_func, types.FunctionType):
             names = get_lambda_args(lambda_func)
-            code_key = id(lambda_func.func_code)
+            code_key = id(func_code(lambda_func))
             cond_expr, external_names, cells = decompile(lambda_func)
         elif isinstance(lambda_func, basestring):
             code_key = lambda_func
@@ -4407,7 +4407,7 @@ class Query(object):
         elif isinstance(func, types.FunctionType):
             argnames = get_lambda_args(func)
             subquery = query._translator.subquery
-            func_id = id(func.func_code)
+            func_id = id(func_code(func))
             func_ast, external_names, cells = decompile(func)
         elif not order_by: throw(TypeError,
             'Argument of filter() method must be a lambda functon or its text. Got: %r' % func)
