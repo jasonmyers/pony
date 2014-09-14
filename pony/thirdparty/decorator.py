@@ -154,7 +154,7 @@ class FunctionMaker(object):
             # print src
             code = compile(src, '<auto generated wrapper of %s() function>' % self.name, 'single')
             # print >> sys.stderr, 'Compiling %s' % src
-            exec code in evaldict
+            exec(code, evaldict)
         except:
             print >> sys.stderr, 'Error in generated code:'
             print >> sys.stderr, src

@@ -57,12 +57,12 @@ def do_test(provider_name, raw_server_version):
     with orm.db_session:
         for statement in statements[:-1]:
             code = compile(statement, '<string>', 'exec')
-            exec code in globals
+            exec(code, globals)
         statement = statements[-1]
         try: last_code = compile(statement, '<string>', 'eval')
         except SyntaxError:
             last_code = compile(statement, '<string>', 'exec')
-            exec last_code in globals
+            exec(last_code, globals)
         else:
             result = eval(last_code, globals)
             if isinstance(result, core.Query): result = list(result)
