@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function, division
 from pony.py23compat import (
-    izip, imap, iteritems, itervalues, xrange, func_code, builtins, pickle, with_metaclass
+    izip, imap, iteritems, itervalues, xrange, func_code, builtins, pickle, with_metaclass,
+    reraise as reraise_
     )
 
 _min = builtins.min
@@ -267,10 +268,7 @@ def reraise(exc_class, exceptions):
         msg = " ".join(tostring(arg) for arg in exc.args)
         if not issubclass(cls, TransactionError):
             msg = '%s: %s' % (cls.__name__, msg)
-        try:
-            raise exc_class(exc_class(msg, exceptions)).with_traceback(tb)
-        except (TypeError, AttributeError):
-            raise (exc_class, exc_class(msg, exceptions), tb)
+        reraise_(exc_class, exc_class(msg, exceptions), tb)
     finally: del tb
 
 @cut_traceback
@@ -359,10 +357,7 @@ class DBSessionContextManager(object):
                             do_retry = exc_value is not None and retry_exceptions(exc_value)
                         if not do_retry: raise
                     finally: self.__exit__(exc_type, exc_value, exc_tb)
-                try:
-                    raise exc_type(exc_value).with_traceback(exc_tb)
-                except (TypeError, AttributeError):
-                    raise (exc_type, exc_value, exc_tb)
+                reraise_(exc_type, exc_value, exc_tb)
             finally: del exc_tb
         return decorator(new_func, func)
     def __enter__(self):

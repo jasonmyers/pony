@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function, division
-from pony.py23compat import izip, xrange, memoryview, pickle, with_metaclass
+from pony.py23compat import izip, xrange, memoryview, pickle, with_metaclass, reraise
 
 import types, sys, re
 from itertools import count
@@ -123,10 +123,8 @@ class SQLTranslator(ASTTranslator):
                     if isinstance(msg, basestring) and '{EXPR}' in msg:
                         msg = msg.replace('{EXPR}', ast2src(node))
                         exc.args = (msg,) + exc.args[1:]
-                try:
-                    raise exc_class(exc).with_traceback(tb)
-                except (TypeError, AttributeError):
-                    raise (exc_class, exc, tb)
+
+                reraise(exc_class, exc, tb)
             finally: del tb
         else:
             if monad is None: return

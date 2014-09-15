@@ -78,3 +78,15 @@ def with_metaclass(metaclass, *bases):
         def __new__(cls, name, this_bases, d):
             return metaclass(name, bases, d)
     return type.__new__(Metaclass, 'temporary_class', (), {})
+
+if PY2:
+    exec("""def reraise(exc_class, exc, tb=None): 
+    raise exc_class, exc, tb
+""")
+else:
+    def reraise(exc_class, exc, tb=None):
+        if exc is None:
+            exc = exc_class()
+        if exc.__traceback__ is not tb:
+            raise exc.with_traceback(tb)
+        raise exc

@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from pony.py23compat import imap, im_func, im_self, im_class
+from pony.py23compat import imap, im_func, im_self, im_class, reraise
 
 import re, os.path, sys, types, warnings
 
@@ -77,10 +77,7 @@ def cut_traceback(func, *args, **kwargs):
                 tb = tb.tb_next
             if last_pony_tb is None: raise
             if tb.tb_frame.f_globals.get('__name__') == 'pony.utils' and tb.tb_frame.f_code.co_name == 'throw':
-                try:
-                    raise exc_type(exc).with_traceback(last_pony_tb)
-                except (TypeError, AttributeError):
-                    raise (exc_type, exc, last_pony_tb)
+                reraise(exc_type, exc, last_pony_tb)
             raise exc  # Set "pony.options.CUT_TRACEBACK = False" to see full traceback
         finally:
             del tb, last_pony_tb
