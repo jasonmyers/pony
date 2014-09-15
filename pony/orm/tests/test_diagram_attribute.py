@@ -420,7 +420,7 @@ class TestAttribute(unittest.TestCase):
             commit()
             Entity1()
             commit()
-        self.assert_(True)
+        self.assertTrue(True)
 
     def test_lambda_1(self):
         db = Database('sqlite', ':memory:')

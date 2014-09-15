@@ -72,7 +72,7 @@ class TestQuery(unittest.TestCase):
         select(s for s in Student if s.gpa == x)
     def test1(self):
         select(g for g in Group for s in db.Student)
-        self.assert_(True)
+        self.assertTrue(True)
     def test2(self):
         avg_gpa = avg(s.gpa for s in Student)
         self.assertEqual(avg_gpa, Decimal('3.2'))
