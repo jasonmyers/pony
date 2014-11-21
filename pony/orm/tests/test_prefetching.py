@@ -107,5 +107,14 @@ class TestPrefetching(unittest.TestCase):
             s1 = Student.select().prefetch(Student.biography).first()
         self.assertEqual(s1.biography, 'some text')
 
+    def test_13(self):
+        with db_session:
+            groups = Group.select().prefetch(Group.students)[:]
+
+        sql = db.last_sql
+        self.assertNotIn('''WHERE "group" = ?''', sql)
+        self.assertIn('''WHERE "group" IN (?, ?)''', sql)
+
+
 if __name__ == '__main__':
     unittest.main()
