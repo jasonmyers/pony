@@ -15,6 +15,8 @@ class Student(db.Entity):
     group = Required('Group')
     courses = Set('Course')
     biography = Optional(LongStr)
+    tutor = Optional('Student')
+    students = Set('Student')
 
 class Group(db.Entity):
     number = PrimaryKey(int)
@@ -33,9 +35,9 @@ with db_session:
     c1 = Course(name='Math')
     c2 = Course(name='Physics')
     c3 = Course(name='Computer Science')
-    Student(id=1, name='S1', group=g1, gpa=3.1, courses=[c1, c2], biography='some text')
-    Student(id=2, name='S2', group=g1, gpa=3.2, scholarship=100, dob=date(2000, 1, 1))
-    Student(id=3, name='S3', group=g1, gpa=3.3, scholarship=200, dob=date(2001, 1, 2), courses=[c2, c3])
+    s1 = Student(id=1, name='S1', group=g1, gpa=3.1, courses=[c1, c2], biography='some text')
+    s2 = Student(id=2, name='S2', group=g1, gpa=3.2, scholarship=100, dob=date(2000, 1, 1), tutor=s1)
+    s3 = Student(id=3, name='S3', group=g1, gpa=3.3, scholarship=200, dob=date(2001, 1, 2), tutor=s2, courses=[c2, c3])
 
 class TestPrefetching(unittest.TestCase):
     def test_1(self):
@@ -106,6 +108,23 @@ class TestPrefetching(unittest.TestCase):
         with db_session:
             s1 = Student.select().prefetch(Student.biography).first()
         self.assertEqual(s1.biography, 'some text')
+
+    def test_13(self):
+        with db_session:
+            tutors = select(s for s in Student if s.tutor is None).prefetch(Student.students)[:]
+            loaded_students = db._get_cache().indexes[Student._pk_attrs_]
+            self.assertIn(s1.id, loaded_students)
+            self.assertIn(s2.id, loaded_students)
+            self.assertIn(s3.id, loaded_students)
+
+    def test_14(self):
+        with db_session:
+            tutors = select(s for s in Student if s.tutor is None).prefetch(Student.students, recursive=False)[:]
+            loaded_students = db._get_cache().indexes[Student._pk_attrs_]
+            self.assertIn(s1.id, loaded_students)
+            self.assertIn(s2.id, loaded_students)
+            self.assertNotIn(s3.id, loaded_students)
+
 
 if __name__ == '__main__':
     unittest.main()

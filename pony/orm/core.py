@@ -4237,6 +4237,7 @@ class Query(object):
         query._result = None
         query._distinct = None
         query._prefetch = False
+        query._recursive_prefetch = True
         query._entities_to_prefetch = set()
         query._attrs_to_prefetch_dict = defaultdict(set)
     def _clone(query, **kwargs):
@@ -4305,13 +4306,18 @@ class Query(object):
             else: stats[sql] = QueryStat(sql)
 
         query._result = result
-        if query._prefetch: query._do_prefetch()
+        if query._prefetch: query._do_prefetch(recursive=query._recursive_prefetch)
         return QueryResult(result, translator.expr_type, translator.col_names)
     @cut_traceback
-    def prefetch(query, *args):
+    def prefetch(query, *args, **kwargs):
+        recursive = kwargs.pop('recursive', True)  # Python 2.7 support, otherwise (..., *args, recursive=True)
+        if kwargs:
+            raise TypeError("prefetch() got an unexpected keyword argument '%s'" % next(iter(kwargs.keys())))
+
         query = query._clone(_entities_to_prefetch=query._entities_to_prefetch.copy(),
                              _attrs_to_prefetch_dict=query._attrs_to_prefetch_dict.copy())
         query._prefetch = True
+        query._recursive_prefetch = recursive
         for arg in args:
             if isinstance(arg, EntityMeta):
                 entity = arg
@@ -4328,7 +4334,7 @@ class Query(object):
             else: throw(TypeError, 'Argument of prefetch() query method must be entity class or attribute. '
                                    'Got: %r' % arg)
         return query
-    def _do_prefetch(query):
+    def _do_prefetch(query, recursive=True):
         expr_type = query._translator.expr_type
         object_list = []
         object_set = set()
@@ -4376,10 +4382,11 @@ class Query(object):
                     if not isinstance(attr, Set): throw(NotImplementedError)
                     setdata = obj._vals_.get(attr)
                     if setdata is None or not setdata.is_fully_loaded: setdata = attr.load(obj)
-                    for obj2 in setdata:
-                        if obj2 not in object_set:
-                            add_to_object_set(obj2)
-                            append_to_object_list(obj2)
+                    if recursive:
+                        for obj2 in setdata:
+                            if obj2 not in object_set:
+                                add_to_object_set(obj2)
+                                append_to_object_list(obj2)
                 elif attr.is_relation:
                     obj2 = attr.get(obj)
                     if obj2 is not None and obj2 not in object_set:
