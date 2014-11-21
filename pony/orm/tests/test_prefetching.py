@@ -125,6 +125,14 @@ class TestPrefetching(unittest.TestCase):
             self.assertIn(s2.id, loaded_students)
             self.assertNotIn(s3.id, loaded_students)
 
+    def test_15(self):
+        with db_session:
+            groups = Group.select().prefetch(Group.students)[:]
+
+        sql = db.last_sql
+        self.assertNotIn('''WHERE "group" = ?''', sql)
+        self.assertIn('''WHERE "group" IN (?, ?)''', sql)
+
 
 if __name__ == '__main__':
     unittest.main()

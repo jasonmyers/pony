@@ -1871,7 +1871,7 @@ class Set(Collection):
             if item._session_cache_ is not cache:
                 throw(TransactionError, 'An attempt to mix objects belonging to different transactions')
         return items
-    def load(attr, obj, items=None):
+    def load(attr, obj, items=None, prefetch=False):
         cache = obj._session_cache_
         if not cache.is_alive: throw(DatabaseSessionIsOver,
             'Cannot load collection %s.%s: the database session is over' % (safe_repr(obj), attr.name))
@@ -1890,7 +1890,7 @@ class Set(Collection):
         counter = cache.collection_statistics.setdefault(attr, 0)
         nplus1_threshold = attr.nplus1_threshold
         prefetching = options.PREFETCHING and not attr.lazy and nplus1_threshold is not None \
-                      and (counter >= nplus1_threshold or cache.noflush_counter)
+                      and (counter >= nplus1_threshold or cache.noflush_counter or prefetch)
 
         if items:
             if not reverse.is_collection:
@@ -4381,7 +4381,7 @@ class Query(object):
                 if attr.is_collection:
                     if not isinstance(attr, Set): throw(NotImplementedError)
                     setdata = obj._vals_.get(attr)
-                    if setdata is None or not setdata.is_fully_loaded: setdata = attr.load(obj)
+                    if setdata is None or not setdata.is_fully_loaded: setdata = attr.load(obj, prefetch=True)
                     if recursive:
                         for obj2 in setdata:
                             if obj2 not in object_set:
